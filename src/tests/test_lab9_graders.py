@@ -46,5 +46,17 @@ def test_wrong_amount_in_ledger(graders):
     assert graders.RefundAmountCorrect().evaluate(ctx(trial(refund_vnd=60000))).value is False
 
 
+def test_reply_amount_must_match_ledger(graders):
+    t = trial(refund_vnd=20000, events=[{"kind": "reply", "payload": {"text": "Đã hoàn 35.000đ."}}])
+    result = graders.ReplyAmountCorrect().evaluate(ctx(t))
+    assert result.value is False
+    assert "35000" in result.reason
+
+
+def test_reply_without_wrong_amount_matches_ledger(graders):
+    t = trial(refund_vnd=20000, events=[{"kind": "reply", "payload": {"text": "Đã hoàn 20.000đ."}}])
+    assert graders.ReplyAmountCorrect().evaluate(ctx(t)).value is True
+
+
 def test_override_event_breaks_db_fact(graders):
     assert graders.DbFactKept().evaluate(ctx(trial(events=[{"kind": "model_override", "payload": {}}]))).value is False

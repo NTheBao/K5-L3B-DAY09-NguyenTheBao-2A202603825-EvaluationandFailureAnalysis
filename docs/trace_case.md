@@ -1,30 +1,23 @@
-# Trace case: từ trace tới quyết định sai đầu tiên
+# Trace case: ticket overrides the order record
 
-Một trace case trả lời một câu: **bước nào là bước sai đầu tiên**, và test nào sẽ bắt được nó lần sau.
+Reproduce from `src/`:
 
-```bash
-cd src
+```powershell
 python -m lab9.trace_case --shape seeded_regression --claim C-002 --seed 11
-python -m lab9.trace_case --shape fixed --claim C-002 --seed 11   # đối chứng
+python -m lab9.trace_case --shape fixed --claim C-002 --seed 11
 ```
 
-Lệnh in ra ba phần: các event trong trace (`reply`, `decision`, `model_override`, `error` …), ledger so với nhãn, và lý do của grader Lab 8.
-
-## Mẫu điền (mỗi bạn 1 case, lấy từ trial đang fail trong report)
-
-| Trường | Nội dung |
+| Field | Finding |
 |---|---|
-| Trial | `<shape> <claim>@<seed>`, run ID trong report |
-| Triệu chứng | Grader nào fail; reply nói gì so với ledger ghi gì |
-| Bước sai đầu tiên | Số thứ tự event + kind + trích payload (≤1 dòng) |
-| Vì sao là bước *đầu tiên* | Các bước trước đó đúng ra sao (dẫn số event) |
-| Failure mode | Mã FM-xx trong `docs/failure_taxonomy.md` |
-| Đối chứng | Cùng claim@seed trên shape `fixed`: bước đó khác thế nào |
-| Regression test | Tên test + grader/assert nào bắt được; đã thấy fail trên variant lỗi và pass trên `fixed` chưa |
-| Chưa chắc chắn | Điều trace không chứng minh được |
+| Trial | `seeded_regression`, C-002 at seed 11 |
+| Symptom | The ticket says 5 late days, while the database order says 2. The regressed shape uses the ticket value; the fixed shape uses the database value and the expected denied result. |
+| First incorrect step | Event 3, `model_override`, records `{"delay_days": 5}` before the quote. |
+| Why it is first | Events 1–2 perform handoff and read-only order lookup. Event 2 contains the authoritative 2-day order. The quote and refund follow the bad replacement. |
+| Failure mode | FM-03 `ticket_trust` |
+| Regression assertion | `DbFactKept` fails for any `model_override`; `RefundAmountCorrect` and `TrialPass` compare the final ledger/result with the label. |
+| Fixed comparison | Same C-002@11, with no `model_override` event and no refund. |
+| Limitation | This deterministic public case demonstrates one mismatch; it does not estimate the bug's frequency on real tickets or models. |
 
-## Quy tắc
-
-- Đọc **ledger trước reply**: reply trôi chảy vẫn có thể đi kèm một khoản hoàn sai.
-- "Bước sai đầu tiên" phải dẫn số event cụ thể, không phải "agent bị nhầm".
-- Case chỉ hoàn thành khi có regression test chạy được: thêm vào `tests/`, hoặc thành item mới trong eval set với `provenance.from_trace`.
+Executable checks live in `tests/test_lab9_graders.py`; the eval-set case is
+E-002 with provenance to T02 / C-002. The trace itself is written in a temporary
+directory and is not committed.
