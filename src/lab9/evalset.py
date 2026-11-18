@@ -31,7 +31,7 @@ FM_CODE = re.compile(r"FM-\d{2}")
 # Public matrix cases are tagged by the failure mode they are designed to expose.
 # Tags are metadata only; the separate labels_v1.json remains the scoring source.
 MATRIX_FAILURE_MODES: dict[str, list[str]] = {
-    "T01": ["FM-01", "FM-08"],
+    "T01": ["FM-01", "FM-07", "FM-08"],
     "T02": ["FM-03"],
     "T03": ["FM-04"],
     "T04": ["FM-10"],
@@ -40,7 +40,7 @@ MATRIX_FAILURE_MODES: dict[str, list[str]] = {
     "T07": ["FM-02"],
     "T08": ["FM-08"],
     "T09": ["FM-03", "FM-01"],
-    "T10": ["FM-01"],
+    "T10": ["FM-01", "FM-07"],
     "T11": ["FM-07"],
     "T12": ["FM-01"],
     "T13": ["FM-02", "FM-05"],

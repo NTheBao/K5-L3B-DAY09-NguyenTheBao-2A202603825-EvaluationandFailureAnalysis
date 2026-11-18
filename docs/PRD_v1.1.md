@@ -49,7 +49,7 @@ swarm report and that the FM-08 grader is registered.
 
 ## 5. Current evidence and open risks
 
-- Generated baseline: run `E-swarm-20261118-3aa8`, eval set SHA `3aa8c6f6ecd1`.
+- Generated baseline: run `E-swarm-20261118-4994`, eval set SHA `49948bd13bb7`.
 - `fixed` passes the gate (exit 0); `seeded_regression` is blocked on refund
   amount, reply amount, and pass rate (exit 1).
 - Fourteen items give limited power; small or rare regressions may be missed.

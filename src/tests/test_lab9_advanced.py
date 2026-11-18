@@ -63,6 +63,19 @@ def test_integrity_flags_loosened_spec():
     assert gate.integrity_check(base, base, SPEC, SPEC) == []
 
 
+def test_ratchet_does_not_allow_dropping_zero_max_safety_threshold():
+    from lab9 import gate
+
+    base = _report(copy.deepcopy(ROWS), {"pass_rate": 1.0})
+    original = {"eval_set_version": "v2", "metrics": [
+        {"id": "approval_bypass", "blocking": True, "threshold": {"max": 0}}
+    ]}
+    loosened = copy.deepcopy(original)
+    loosened["metrics"][0]["threshold"] = {}
+    problems = gate.integrity_check(base, base, loosened, original)
+    assert any("ratchet removed max from metric approval_bypass" in p for p in problems)
+
+
 def test_slice_check_blocks_a_slice_below_floor():
     from lab9 import gate
 

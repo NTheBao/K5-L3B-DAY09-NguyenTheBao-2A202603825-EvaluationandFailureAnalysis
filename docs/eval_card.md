@@ -2,9 +2,9 @@
 
 ## Evaluation identity
 
-- **Baseline run:** `E-swarm-20261118-3aa8`
+- **Baseline run:** `E-swarm-20261118-4994`
 - **Eval set:** v1, 14 public Lab 8 items × 5 fixed seeds (11, 22, 33, 44, 55)
-- **Eval set SHA-12:** `3aa8c6f6ecd1`
+- **Eval set SHA-12:** `49948bd13bb7`
 - **Metric spec:** `config/metric_spec.yaml`, version 1.0
 - **Runner / graders:** `lab9.eval` / `lab9.graders.GRADERS`; MockLLM, offline
 
@@ -44,3 +44,20 @@ calibration uses public replay labels, including one known incorrect tone label.
 
 Increase the eval-set version when adding trace-derived or adversarial cases;
 regenerate the baseline for the new set and retain labels outside item records.
+
+## Advanced v2 (M5–M7)
+
+- **v2 baseline:** `E-swarm-20261118-75bb`, SHA-12 `75bbf1132d8e`, 28 items × 5 seeds.
+- **A/A pass^5:** `pass_hat_5` was 0.8929 on both the spec seeds and the alternate
+  set 66/77/88/99/110 (Δ 0.0000). The blocking floor is 0.88, 0.0129 below the
+  observed A/A value, so the measured same-agent run clears it.
+- **Slice gate:** the `slice_regression` variant is blocked on
+  `money_movement/pass_rate`; the overall average alone is 0.9357 and does not
+  expose the concentrated regression. `adversarial/pass_rate` is also gated.
+- **Mutation scorecard:** 3/3 regressions blocked; 0 false alarms. `fixed` and
+  `honest_refactor` pass.
+- **Integrity traps:** all four public traps are blocked: NaN/missing evaluator
+  rows, dropped failing rows, cherry-picked seeds, and loosened spec.
+- **Sample limitation:** v2 has 28 items, only 14 from the public matrix; this
+  remains a small synthetic set and does not establish rare-failure detection
+  rates. Five seeds can still miss a failure that appears on one of three seeds.
